@@ -39,3 +39,17 @@ if st.button("🚀 Recommend Best Cards"):
         - 💸 Annual Fee: ₹{rec['annual_fee']}
         - ✅ Net Savings: ₹{rec['net_savings']}
         """)
+
+pip install streamlit -q
+pip install pyngrok -q
+
+# Replace YOUR_AUTHTOKEN with the token you copied
+ngrok config add-authtoken 30KmYldCPK7PtSrfuexzK64yG42_3AvatCyUYmF6UnRgFepwb
+
+from pyngrok import ngrok
+import os
+
+# Save your app.py in the current directory
+os.system("streamlit run app.py &")
+public_url = ngrok.connect(8501)
+print(public_url)
