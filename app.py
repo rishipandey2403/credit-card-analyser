@@ -1,23 +1,39 @@
-# app.py
-
 import streamlit as st
 from optimizer import recommend_cards
 
-st.set_page_config(page_title="💳 Credit Card Optimizer", layout="centered")
+st.set_page_config(page_title="Credit Card Optimizer", layout="centered")
 
-st.title("💳 Credit Card Optimizer AI Agent")
-st.markdown("#### Enter your average monthly spending:")
+st.title("💳 Credit Card Optimizer")
+st.markdown("#### Find the best card based on your monthly spending in different categories.")
 
-# Define spend categories dynamically (can be extended)
-spend_categories = ["Grocery", "Travel", "Fuel", "Dining"]
+# Collect user input
+st.sidebar.header("Enter Your Monthly Spend (₹)")
+grocery_spend = st.sidebar.number_input("Grocery", min_value=0, value=3000)
+travel_spend = st.sidebar.number_input("Travel", min_value=0, value=2000)
+fuel_spend = st.sidebar.number_input("Fuel", min_value=0, value=1000)
+dining_spend = st.sidebar.number_input("Dining", min_value=0, value=1500)
+top_n = st.sidebar.slider("Number of Top Cards to Show", 1, 10, 3)
 
-spend_dict = {}
-for category in spend_categories:
-    spend = st.number_input(f"{category} (₹)", min_value=0, value=1000, step=100)
-    spend_dict[category] = spend
+# When the user clicks the button
+if st.button("🔍 Recommend Best Cards"):
+    # Prepare the spend dictionary
+    spend_dict = {
+        "grocery": grocery_spend,
+        "travel": travel_spend,
+        "fuel": fuel_spend,
+        "dining": dining_spend
+    }
 
-if st.button("🔍 Find Best Cards"):
-    recommendations = recommend_cards(spend_dict)
+    try:
+        recommendations, total_savings = recommend_cards(spend_dict, top_n=top_n)
 
-    st.subheader("🎯 Top Credit Card Recommendations")
-    st.dataframe(recommendations.reset_index(drop=True), use_container_width=True)
+        if recommendations:
+            st.success(f"🎯 Potential annual savings: ₹{total_savings}")
+
+            st.markdown("### 💡 Top Recommended Cards")
+            st.table(recommendations)
+        else:
+            st.warning("No suitable cards found. Try adjusting your spends.")
+
+    except Exception as e:
+        st.error(f"Something went wrong: {e}")
